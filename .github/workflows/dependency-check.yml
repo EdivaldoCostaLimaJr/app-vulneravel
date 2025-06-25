@@ -23,7 +23,7 @@ jobs:
 
     - name: Instalar OWASP Dependency-Check
       run: |
-        curl -L -o dependency-check.zip https://github.com/jeremylong/DependencyCheck/releases/latest/download/dependency-check.zip
+        curl -L -o dependency-check.zip https://github.com/jeremylong/DependencyCheck/releases/download/v8.3.1/dependency-check-8.3.1-release.zip
         unzip dependency-check.zip -d dc
         chmod +x dc/dependency-check/bin/dependency-check.sh
 
@@ -31,51 +31,15 @@ jobs:
       run: |
         ./dc/dependency-check/bin/dependency-check.sh --updateonly
 
-    - name: Executar análise de dependências (JSON)
+    - name: Executar análise de dependências
       run: |
-        mkdir -p reports
         ./dc/dependency-check/bin/dependency-check.sh \
           --project "App Vulnerável" \
           --scan . \
           --format "JSON" \
           --out reports \
-          --log reports/dc.log \
+          --log reports/dc.log
           --disableAssembly
-
-    - name: Converter JSON para HTML
-      run: |
-        sudo apt-get update && sudo apt-get install -y python3
-        cat << 'EOF' > convert_report.py
-        import json
-        from pathlib import Path
-
-        def generate_html_report(json_path, output_path):
-            with open(json_path, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-
-            html = ['<html><head><meta charset="utf-8"><title>Dependency Check Report</title></head><body>']
-            html.append(f"<h1>Dependency-Check Report: {data.get('projectInfo', {}).get('name', 'N/A')}</h1>")
-
-            dependencies = data.get('dependencies', [])
-            for dep in dependencies:
-                vuln_list = dep.get('vulnerabilities', [])
-                if vuln_list:
-                    html.append(f"<h2>Arquivo: {dep.get('fileName')}</h2>")
-                    html.append("<ul>")
-                    for vuln in vuln_list:
-                        name = vuln.get('name', 'N/A')
-                        severity = vuln.get('severity', 'N/A')
-                        description = vuln.get('description', '').replace('\n', '<br>')
-                        html.append(f"<li><strong>{name}</strong> (Severidade: {severity})<br>{description}</li>")
-                    html.append("</ul>")
-
-            html.append("</body></html>")
-            Path(output_path).write_text('\n'.join(html), encoding='utf-8')
-
-        generate_html_report('reports/dependency-check-report.json', 'reports/dependency-check-report.html')
-        EOF
-
-        python3 convert_report.py
 
     - name: Upload do relatório como artefato
       uses: actions/upload-artifact@v4
