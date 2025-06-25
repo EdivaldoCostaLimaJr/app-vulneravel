@@ -2,38 +2,36 @@ name: Dependency-Check
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    types: [opened, synchronize, reopened]
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   dependency-check:
-    name: Dependency-Check
     runs-on: ubuntu-latest
 
-    steps: 
-      - name: Checkout código
-        uses: actions/checkout@v3
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v3
 
-      - name: Download OWASP Dependency Check
-        run: |
-          VERSION=$(curl -s https://jeremylong.github.io/DependencyCheck/current.txt)
-          curl -sL "https://github.com/jeremylong/DependencyCheck/releases/download/v$VERSION/dependency-check-$VERSION-release.zip" --output dependency-check.zip
-          unzip dependency-check.zip -d dependency-check
+    - name: Baixar OWASP Dependency-Check (v8.4.0)
+      run: |
+        curl -sL https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.0/dependency-check-8.4.0-release.zip -o dependency-check.zip
+        unzip dependency-check.zip -d dependency-check
 
-      - name: Run Dependency Check
-        run: |
-          mkdir -p reports
-          ./dependency-check/dependency-check/bin/dependency-check.sh \
-            --project "App Vulnerável" \
-            --scan . \
-            --out reports \
-            --format "HTML,JSON" \
-            --disableAssembly || echo "Erro no scan, tentando fallback se necessário"
+    - name: Executar Dependency-Check em HTML
+      run: |
+        mkdir -p reports
+        ./dependency-check/dependency-check/bin/dependency-check.sh \
+          --project "App Vulnerável" \
+          --scan . \
+          --out reports \
+          --format "HTML" \
+          --disableAssembly
 
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: dependency-check-report
-          path: reports
+    - name: Upload do relatório HTML
+      uses: actions/upload-artifact@v4
+      with:
+        name: dependency-check-report
+        path: reports/dependency-check-report.html
