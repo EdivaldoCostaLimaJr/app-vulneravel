@@ -38,7 +38,8 @@ jobs:
           --scan . \
           --format "JSON" \
           --out reports \
-          --log reports/dc.log
+          --log reports/dc.log \
+          --disableAssembly
 
     - name: Upload do relatório como artefato
       uses: actions/upload-artifact@v4
