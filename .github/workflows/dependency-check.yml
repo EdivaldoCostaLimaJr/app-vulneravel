@@ -24,13 +24,13 @@ jobs:
         run: |
           VERSION="8.4.2"
           curl -L "https://github.com/jeremylong/DependencyCheck/releases/download/v$VERSION/dependency-check-$VERSION-release.zip" -o dependency-check.zip
-          unzip dependency-check.zip -d dependency-check
-          chmod +x dependency-check/bin/dependency-check.sh
+          unzip dependency-check.zip -d dc-unpacked
+          chmod +x dc-unpacked/dependency-check/bin/dependency-check.sh
 
       - name: Run Dependency-Check
         run: |
           mkdir -p dependency-check-report
-          ./dependency-check/bin/dependency-check.sh \
+          ./dc-unpacked/dependency-check/bin/dependency-check.sh \
             --project "app-vulneravel" \
             --scan ./ \
             --format HTML \
