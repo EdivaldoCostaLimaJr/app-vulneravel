@@ -22,7 +22,8 @@ jobs:
 
       - name: Install OWASP Dependency-Check
         run: |
-          curl -L https://github.com/jeremylong/DependencyCheck/releases/latest/download/dependency-check.zip -o dependency-check.zip
+          VERSION="8.4.2"
+          curl -L "https://github.com/jeremylong/DependencyCheck/releases/download/v$VERSION/dependency-check-$VERSION-release.zip" -o dependency-check.zip
           unzip dependency-check.zip -d dependency-check
           chmod +x dependency-check/bin/dependency-check.sh
 
@@ -39,4 +40,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dependency-check-html-report
-          path: dependency-check-report/depende
+          path: dependency-check-report/dependency-check-report.html
