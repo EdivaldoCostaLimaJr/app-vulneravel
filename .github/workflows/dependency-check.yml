@@ -21,9 +21,9 @@ jobs:
         java-version: '8'
         distribution: 'temurin'
 
-    - name: Instalar OWASP Dependency-Check
+    - name: Instalar OWASP Dependency-Check (última versão)
       run: |
-        curl -L -o dependency-check.zip https://github.com/jeremylong/DependencyCheck/releases/download/v8.3.1/dependency-check-8.3.1-release.zip
+        curl -L -o dependency-check.zip https://github.com/jeremylong/DependencyCheck/releases/latest/download/dependency-check.zip
         unzip dependency-check.zip -d dc
         chmod +x dc/dependency-check/bin/dependency-check.sh
 
@@ -31,15 +31,16 @@ jobs:
       run: |
         ./dc/dependency-check/bin/dependency-check.sh --updateonly
 
-    - name: Executar análise de dependências
+    - name: Executar análise de dependências (HTML)
       run: |
-       ./dc/dependency-check/bin/dependency-check.sh \
-        --project "App Vulnerável" \
-        --scan . \
-        --format "JSON" \
-        --out reports \
-        --log reports/dc.log \
-        --disableAssembly
+        mkdir -p reports
+        ./dc/dependency-check/bin/dependency-check.sh \
+          --project "App Vulnerável" \
+          --scan . \
+          --format "HTML" \
+          --out reports \
+          --log reports/dc.log \
+          --disableAssembly
 
     - name: Upload do relatório como artefato
       uses: actions/upload-artifact@v4
