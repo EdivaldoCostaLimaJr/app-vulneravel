@@ -31,14 +31,15 @@ jobs:
       run: |
         ./dc/dependency-check/bin/dependency-check.sh --updateonly
 
-    - name: Executar análise de dependências (HTML)
+    - name: Executar análise de dependências
       run: |
         ./dc/dependency-check/bin/dependency-check.sh \
           --project "App Vulnerável" \
           --scan . \
           --format "HTML" \
           --out reports \
-          --log reports/dc.log
+          --log reports/dc.log \
+          --disableAssembly
 
     - name: Upload do relatório como artefato
       uses: actions/upload-artifact@v4
