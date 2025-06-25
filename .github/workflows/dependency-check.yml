@@ -21,9 +21,9 @@ jobs:
         java-version: '8'
         distribution: 'temurin'
 
-    - name: Instalar OWASP Dependency-Check (última versão)
+    - name: Instalar OWASP Dependency-Check (v8.4.0)
       run: |
-        curl -L -o dependency-check.zip https://github.com/jeremylong/DependencyCheck/releases/latest/download/dependency-check.zip
+        curl -L -o dependency-check.zip https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.0/dependency-check-8.4.0-release.zip
         unzip dependency-check.zip -d dc
         chmod +x dc/dependency-check/bin/dependency-check.sh
 
