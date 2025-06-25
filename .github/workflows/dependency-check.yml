@@ -1,49 +1,27 @@
-name: Dependency Check
-
+name: Dependency-Check
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
-  workflow_dispatch:
-
+    types: [opened, synchronize, reopened]
 jobs:
   dependency-check:
+    name: Dependency-Check
     runs-on: ubuntu-latest
+    steps: 
+      - name: Download OWASP Dependency Check
+        run: |
+          VERSION=$(curl -s https://jeremylong.github.io/DependencyCheck/current.txt)
+          curl -sL "https://github.com/jeremylong/DependencyCheck/releases/download/v$VERSION/dependency-check-$VERSION-release.zip" --output dependency-check.zip
+          unzip dependency-check.zip
+      - name: Run Dependency Check
+        run: |
+          ./dependency-check/bin/dependency-check.sh --out report.html --scan .
+          rm -rf dependency-check*
 
-    steps:
-    - name: Checkout código
-      uses: actions/checkout@v3
-
-    - name: Configurar Java
-      uses: actions/setup-java@v3
-      with:
-        java-version: '8'
-        distribution: 'temurin'
-
-    - name: Instalar OWASP Dependency-Check (v8.4.0)
-      run: |
-        curl -L -o dependency-check.zip https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.0/dependency-check-8.4.0-release.zip
-        unzip dependency-check.zip -d dc
-        chmod +x dc/dependency-check/bin/dependency-check.sh
-
-    - name: Atualizar base de dados do Dependency-Check
-      run: |
-        ./dc/dependency-check/bin/dependency-check.sh --updateonly
-
-    - name: Executar análise de dependências (HTML)
-      run: |
-        mkdir -p reports
-        ./dc/dependency-check/bin/dependency-check.sh \
-          --project "App Vulnerável" \
-          --scan . \
-          --format "HTML" \
-          --out reports \
-          --log reports/dc.log \
-          --disableAssembly
-
-    - name: Upload do relatório como artefato
-      uses: actions/upload-artifact@v4
-      with:
-        name: dependency-check-report
-        path: reports
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifacts
+          path: report.html
