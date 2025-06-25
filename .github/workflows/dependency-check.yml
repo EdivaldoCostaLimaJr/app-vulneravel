@@ -27,17 +27,24 @@ jobs:
           unzip dependency-check.zip -d dc-unpacked
           chmod +x dc-unpacked/dependency-check/bin/dependency-check.sh
 
-      - name: Run Dependency-Check
+      - name: Run Dependency-Check (HTML + JSON)
         run: |
           mkdir -p dependency-check-report
           ./dc-unpacked/dependency-check/bin/dependency-check.sh \
             --project "app-vulneravel" \
             --scan ./ \
-            --format HTML \
-            --out dependency-check-report
+            --format HTML,JSON \
+            --out dependency-check-report \
+            --disableAssembly
 
       - name: Upload HTML Report
         uses: actions/upload-artifact@v4
         with:
           name: dependency-check-html-report
           path: dependency-check-report/dependency-check-report.html
+
+      - name: Upload JSON Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-json-report
+          path: dependency-check-report/dependency-check-report.json
